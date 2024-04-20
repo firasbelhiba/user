@@ -5,6 +5,7 @@ import { Link, RouteComponentProps } from "@gatsbyjs/reach-router";
 import { createGlobalStyle } from "styled-components";
 import {  useNavigate } from 'react-router-dom';
 import {Button, ButtonGroup} from "@nextui-org/react";
+import { createCollection } from "../ConnectWallet/connectWallet";
 
 
 
@@ -44,6 +45,9 @@ const UpgradableNFT: React.FC <RouteComponentProps>= ({ path })  => {
   const [files, setFiles] = useState<FileWithPreview[]>([]);
   const [active, setActive] = useState('regular');
   const navigate = useNavigate();
+  const [inputTitle, setInputTitle] = useState<string>();
+  const [inputSymbol, setInputSymbol] = useState<string>();
+  const [inputDescription, setInputDescription] = useState<string>();
 
   // Define handleButtonClick using useNavigate for navigation
   const handleButtonClick = (type: string) => {
@@ -104,15 +108,26 @@ const UpgradableNFT: React.FC <RouteComponentProps>= ({ path })  => {
                 <div className="spacer-single"></div>
 
                 <h5>Title</h5>
-                <input type="text" name="item_title" id="item_title" className="form-control" placeholder="e.g. 'Crypto Funk" />
+                <input type="text" name="item_title" value={inputTitle} className="form-control" placeholder="e.g. 'Crypto Funk"  onChange={(e) => {
+                    setInputTitle(e.target.value);
+                }
+                  } />
 
                 <h5>Symbol</h5>
-                <input type="text" name="item_title" id="item_title" className="form-control" placeholder="e.g. 'MAS" />
+                <input type="text" name="item_title" value={inputSymbol} className="form-control" placeholder="e.g. 'MAS"
+                onChange={(e) => {
+                  setInputSymbol(e.target.value);
+              }
+                } />
 
                 <div className="spacer-10"></div>
 
                 <h5>Description</h5>
-                <textarea data-autoresize name="item_desc" id="item_desc" className="form-control" placeholder="e.g. 'This is very limited item'"></textarea>
+                <textarea data-autoresize name="item_desc" value={inputDescription} className="form-control" placeholder="e.g. 'This is very limited item'"
+                onChange={(e) => {
+                  setInputDescription(e.target.value);
+              }
+                }></textarea>
 
                 <div className="spacer-10"></div>
 
@@ -125,8 +140,12 @@ const UpgradableNFT: React.FC <RouteComponentProps>= ({ path })  => {
                 <input type="text" name="item_royalties" id="item_royalties" className="form-control" placeholder="suggested: 0, 10%, 20%, 30%. Maximum is 70%" />
 
                 <div className="spacer-10"></div>
-
-                <input type="button" id="submit" className="btn-main" value="Create Collection"/>
+               
+                <Button className="btn-main" onClick={createCollection(false, inputTitle || '',inputSymbol || '',inputDescription || '')}>
+                  <h5>create Collection</h5>
+                
+                  
+                 </Button>
               </div>
             </form>
           </div>

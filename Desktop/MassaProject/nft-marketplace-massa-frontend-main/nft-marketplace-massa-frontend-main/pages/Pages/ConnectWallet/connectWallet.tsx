@@ -7,6 +7,7 @@ import {
   Client,
   bytesToStr,
   fromMAS,
+  ArrayTypes,
 } from "@massalabs/massa-web3";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "@massalabs/react-ui-kit";
@@ -17,16 +18,112 @@ enum Provider {
   BEARBY = "BEARBY",
 }
 
+
+
+  const CONTRACT_ADDRESS =
+  "AS1vSHpzLzzXUVfdYE8gcw3RyBUz9g1JyNXcN1Vnk7nzfWjMqQSN";
+  
+  
+  
+  
+  
+
+
+ export const createCollection = (is_upgradable:boolean,inputTitle: string ,inputsymbol:string,inputDescription:string ) => async () => 
+  { const [client, setClient] = useState<Client>();
+    const [errorMessage, setErrorMessage] = useState<any>();
+    const [lastOpId, setLastOpId] = useState<string>();
+
+    setErrorMessage(null);
+    if (!client) return;
+    if (!inputTitle ) {
+      setErrorMessage("Please enter a name");
+      return;
+    }
+    if (!inputsymbol ) {
+      setErrorMessage("Please enter the symbol");
+      return;
+    }
+    if (!inputDescription ) {
+      setErrorMessage("Please enter the description");
+      return;
+    }
+    
+    try {
+      let args = new Args().addBool(is_upgradable).addString(inputTitle).addString(inputsymbol).addString(inputDescription);
+      let opId = await client.smartContracts().callSmartContract({
+        targetAddress: CONTRACT_ADDRESS,
+        functionName: "create_nft",
+        parameter: args,
+        maxGas: BigInt(2000000000),
+        coins: BigInt(10000000000),
+        fee: BigInt(0),
+      });
+      setLastOpId(opId);
+    } catch (error: any) {
+      console.error(error);
+    }
+  };
+
+
+  
+ export const importCollection = (addressCollection:string ) => async () => 
+  { const [client, setClient] = useState<Client>();
+    const [errorMessage, setErrorMessage] = useState<any>();
+    const [lastOpId, setLastOpId] = useState<string>();
+
+    setErrorMessage(null);
+    if (!client) return;
+    if (!addressCollection ) {
+      setErrorMessage("Please enter an address");
+      return;
+    }
+    
+    try {
+      let args = new Args().addString(addressCollection);
+      let opId = await client.smartContracts().callSmartContract({
+        targetAddress: CONTRACT_ADDRESS,
+        functionName: "register_nft",
+        parameter: args,
+        maxGas: BigInt(2100000),
+        coins: BigInt(1000000000),
+        fee: BigInt(0),
+      });
+      setLastOpId(opId);
+    } catch (error: any) {
+      console.error(error);
+    }
+  };
+
+  export const getRegularCollection = async () => {
+    const [client, setClient] = useState<Client>();
+    const [errorMessage, setErrorMessage] = useState<any>();
+    
+    setErrorMessage(null);
+    if (!client) return;
+   
+    try {
+      let res = await client.smartContracts().readSmartContract({
+        maxGas: BigInt(1000000),
+        targetAddress: CONTRACT_ADDRESS,
+        targetFunction: "getRegCollections",
+        parameter: new Args().serialize(),
+      });
+
+      console.log(new Args(res.returnValue).nextArray(ArrayTypes.STRING));
+    } catch (error) {
+      console.error(error);
+    }
+  };
 function ConnectWallet() {
+ 
   const [client, setClient] = useState<Client>();
   const [provider, setProvider] = useState<Provider>();
   const [account, setAccount] = useState<IAccount>();
   const [lastOpId, setLastOpId] = useState<string>();
   const [errorMessage, setErrorMessage] = useState<any>();
-
   const isConnected = useSelector((state: any) => state.wallet.isConnected);
   const dispatch = useDispatch();
-
   const initialize = async (providerName: Provider) => {
     setErrorMessage(null);
     const providersList = await providers(true, 10000);
@@ -58,6 +155,12 @@ function ConnectWallet() {
   useEffect(() => {
     initialize(Provider.BEARBY);
   }, []);
+
+
+
+
+
+
 
   return (
 
